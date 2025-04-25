@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="extractSingleTileFunction" Id="{f516bd77-e42e-4d3c-ae61-5ca57f80398b}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK extractSingleTileFunction
+
+VAR_IN_OUT
+	tile: ARRAY[1..constants.TILE_WIDTH, 1..constants.TILE_HEIGHT] OF REAL;
+END_VAR
+
+VAR_INPUT
+	tiles: ARRAY[1..constants.NUM_TILES, 1..constants.TILE_WIDTH, 1..constants.TILE_HEIGHT] OF REAL; 
+	tileToExtract: UDINT; // Assuming it is within the number of admissible tiles
+	start: BOOL;
+END_VAR
+
+VAR_OUTPUT
+	finished: BOOL;
+END_VAR
+
+VAR
+	x: UDINT;
+	y: UDINT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF start AND (NOT finished) THEN
+	
+	
+	FOR x := 1 TO constants.TILE_WIDTH DO
+		FOR y := 1 TO constants.TILE_HEIGHT DO
+			
+			tile[x, y] := tiles[tileToExtract, x, y];
+			
+		END_FOR;
+	END_FOR
+	
+	finished := TRUE;
+	
+END_IF]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

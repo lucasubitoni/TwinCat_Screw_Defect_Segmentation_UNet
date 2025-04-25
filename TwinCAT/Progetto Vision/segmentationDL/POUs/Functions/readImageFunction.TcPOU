@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="readImageFunction" Id="{a50baac0-4f31-46ef-a7dd-2967ee2726c7}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK readImageFunction
+
+VAR_IN_OUT
+	image: ITcVnImage;
+	imageDisp: ITcVnDisplayableImage;
+END_VAR
+
+VAR_INPUT
+	filePath: STRING;
+END_VAR
+
+VAR_OUTPUT
+	error: BOOL;
+	finished: BOOL;
+END_VAR
+
+
+VAR
+	readImageTrg: F_TRIG;	
+
+	readImage: FB_VN_ReadImage;
+	readImageCmd: BOOL := TRUE;
+	
+	imageRef: REFERENCE TO ITcVnImage;
+	imageDispRef: REFERENCE TO ITcVnDisplayableImage;
+	
+	hResult: HRESULT;
+	isImageRead: BOOL;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// Assign references
+imageRef REF= image;
+imageDispRef REF= imageDisp;
+
+// Read the image
+readImage(sFilePath := filePath,
+          ipDestimage := imageRef,
+          bRead := readImageCmd);
+		 
+// Trigger on when the image is read
+readImageTrg(CLK := readImage.bBusy);
+
+// If there is an error, latch onto it
+IF readImage.bError THEN
+    error := TRUE;
+END_IF
+
+// Reset the command after execution if needed for edge triggering
+IF readImage.bBusy THEN
+    readImageCmd := FALSE;
+END_IF
+
+// Raise a flag when the image has been read
+IF (readImageTrg.Q) AND (NOT error) THEN
+	isImageRead := TRUE;
+END_IF
+
+// Convert to a displayable image to view in the ADS Image View, if possible
+IF (NOT error) AND (isImageRead) AND (NOT finished) THEN
+	
+    // Copy the image into a displayable one so that we can access it via the ADS Image Watch
+    hResult := F_VN_CopyIntoDisplayableImage(ipSrcImage := image,
+                                             ipDestImage := imageDispRef,
+                                             hrPrev := hResult);
+
+	// If there is an error, latch onto it
+    IF FAILED(hResult) THEN
+        error := TRUE;
+    END_IF
+	
+	IF SUCCEEDED(hResult) THEN
+		finished := TRUE;
+	END_IF
+	
+END_IF
+
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

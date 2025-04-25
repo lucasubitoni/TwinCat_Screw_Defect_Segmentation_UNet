@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="matrixToImageFunction" Id="{315bde1f-e206-4452-a96b-bb3b53dafa88}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK matrixToImageFunction
+
+VAR_IN_OUT
+	matrix: ARRAY[1..constants.IMG_WIDTH, 1..constants.IMG_HEIGHT] OF REAL;
+	image: ITcVnImage;
+	imageDisp: ITcVnDisplayableImage;
+END_VAR
+
+VAR_INPUT
+	start: BOOL;
+END_VAR
+
+VAR_OUTPUT
+	error: BOOL;
+	finished: BOOL;
+END_VAR
+
+VAR
+	flattenMatrix: flattenMatrixFunction;
+	hResult: HRESULT;
+	ePixelType: ETcVnElementType;
+	imageDispRef: REFERENCE TO ITcVnDisplayableImage;
+	flattenedMatrix: ARRAY[1..constants.IMG_WIDTH*constants.IMG_HEIGHT] OF REAL;
+	flattenedMatrixPtr: POINTER TO ARRAY[1..constants.IMG_WIDTH*constants.IMG_HEIGHT] OF REAL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF (start) AND (NOT finished) THEN
+	
+	imageDispRef REF= imageDisp;
+	
+	// Flatten the matrix
+	flattenMatrix(matrix := matrix,
+				  start := start,
+				  flattenedMatrix := flattenedMatrix);
+				  
+	// When it finished flattening, we create the image object of Twincat Vision
+	IF flattenMatrix.finished THEN
+		
+		flattenedMatrixPtr := ADR(flattenedMatrix);
+		
+
+		F_VN_CreateImageFromArray(nWidth := constants.IMG_WIDTH,
+								  nHeight := constants.IMG_HEIGHT,
+								  nChannelNum := 1, 					// Black and white
+								  ipImage := image,
+								  pData := flattenedMatrixPtr,
+								  ePixelType := ETcVnElementType.TCVN_ET_REAL,
+								  hrPrev := hResult);
+								  
+		IF FAILED(hResult) THEN
+			error := TRUE;
+		END_IF
+								  
+		IF SUCCEEDED(hResult) THEN
+				  
+			// Copy the image into a displayable one so that we can access it via the ADS Image Watch
+			hResult := F_VN_CopyIntoDisplayableImage(ipSrcImage := image,
+													 ipDestImage := imageDispRef,
+													 hrPrev := hResult);
+			IF FAILED(hResult) THEN
+				error := TRUE;
+			END_IF
+			IF SUCCEEDED(hResult) THEN 
+				finished := TRUE;
+			END_IF
+					
+		END_IF
+	
+	END_IF
+	
+END_IF
+	]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

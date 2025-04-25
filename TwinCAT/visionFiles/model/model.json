@@ -1,0 +1,32 @@
+{
+	"MLlib_JSON_File": {
+		"MachineLearningModel": {
+			"str_modelName": "onnx_wrapper",
+			"CustomAttributes": {},
+			"AuxiliarySpecifications": {
+				"PTI": {
+					"str_producer": "Beckhoff MLlib",
+					"str_producerVersion": "3.1.240927.2",
+					"str_requiredVersion": "3.1.240927.1"
+				}
+			},
+			"Configuration": {
+				"str_onnxHash": "C0KakY5vW4ftHH7Kra73PSAEOlHpf+cLj6IoNP1B1po=",
+				"Inputs": {
+					"TensorDesc0": {
+						"str_name": "args_0",
+						"str_dt": "fp32",
+						"int32_shape": [1, 288, 216, 1]
+					}
+				},
+				"Outputs": {
+					"TensorDesc0": {
+						"str_name": "conv2d_14",
+						"str_dt": "fp32",
+						"int32_shape": [1, 288, 216, 1]
+					}
+				}
+			}
+		}
+	}
+}

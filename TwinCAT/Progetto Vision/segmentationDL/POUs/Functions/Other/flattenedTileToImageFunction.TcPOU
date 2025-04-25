@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="flattenedTileToImageFunction" Id="{1430ee17-140d-44a5-bdd3-5646c8118b7f}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK flattenedTileToImageFunction
+
+VAR_IN_OUT
+	image: ITcVnImage;
+	imageDisp: ITcVnDisplayableImage;
+	flattenedTile: ARRAY[1..constants.TILE_WIDTH*constants.TILE_HEIGHT] OF REAL;
+END_VAR
+
+VAR_INPUT
+	start: BOOL;
+END_VAR
+
+VAR
+	finished: BOOL;
+	hResult: HRESULT;
+	imageDispRef: REFERENCE TO ITcVnDisplayableImage;
+	flattenedTilePtr: POINTER TO ARRAY[1..constants.TILE_WIDTH*constants.TILE_HEIGHT] OF REAL;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF (start) AND (NOT finished) THEN
+	
+	imageDispRef REF= imageDisp;
+	
+	flattenedTilePtr := ADR(flattenedTile);
+	
+	F_VN_CreateImageFromArray(nWidth := constants.TILE_WIDTH,
+							  nHeight := constants.TILE_HEIGHT,
+							  nChannelNum := 1, 					// Black and white
+							  ipImage := image,
+							  pData := flattenedTilePtr,
+							  ePixelType := ETcVnElementType.TCVN_ET_REAL,
+							  hrPrev := hResult);
+							  
+	IF SUCCEEDED(hResult) THEN
+			  
+		// Copy the image into a displayable one so that we can access it via the ADS Image Watch
+		hResult := F_VN_CopyIntoDisplayableImage(ipSrcImage := image,
+												 ipDestImage := imageDispRef,
+												 hrPrev := hResult);
+		IF SUCCEEDED(hResult) THEN 
+			finished := TRUE;
+		END_IF
+		
+		
+	END_IF
+	
+END_IF
+	]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

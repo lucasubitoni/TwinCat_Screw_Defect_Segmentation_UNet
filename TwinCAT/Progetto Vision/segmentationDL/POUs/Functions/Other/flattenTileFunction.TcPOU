@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="flattenTileFunction" Id="{11f28e8c-49e9-4beb-a0b2-4ad9fdf6b794}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK flattenTileFunction
+VAR_INPUT
+	tile: ARRAY[1..constants.TILE_WIDTH, 1..constants.TILE_HEIGHT] OF REAL;
+	start: BOOL;
+END_VAR
+
+VAR_IN_OUT
+	flattenedTile: ARRAY[1..constants.TILE_WIDTH*constants.TILE_HEIGHT] OF REAL;
+END_VAR
+
+VAR_OUTPUT
+	finished: BOOL;
+END_VAR
+
+VAR
+	i: UDINT;
+	x: UDINT;
+	y: UDINT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+IF (start) AND (NOT finished) THEN
+	
+	// We start from one
+	i := 1;
+		
+	// First we have to cycle on the y
+	FOR y := 1 TO constants.TILE_HEIGHT DO
+		// Then we have to cycle no the x --> the flattened array is expected in this form
+		FOR x := 1 TO constants.TILE_WIDTH DO
+			flattenedTile[i] := tile[x, y];
+			i := i+1;
+		END_FOR
+	END_FOR
+
+	finished := TRUE;
+
+END_IF]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

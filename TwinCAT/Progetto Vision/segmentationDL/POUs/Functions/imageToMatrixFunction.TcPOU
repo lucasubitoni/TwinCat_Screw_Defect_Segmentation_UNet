@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="imageToMatrixFunction" Id="{0dcb2cd2-2f44-4225-95be-5f86cb01f630}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK imageToMatrixFunction
+
+// See: https://infosys.beckhoff.com/english.php?content=../content/1033/tf7xxx_tc3_vision/6997345803.html&id=
+
+VAR_IN_OUT
+	imageMatrix: ARRAY[1..constants.IMG_WIDTH, 1..constants.IMG_HEIGHT] OF REAL;
+END_VAR
+
+VAR_INPUT
+	image: ITcVnImage;
+	start: BOOL;
+END_VAR
+
+VAR_OUTPUT
+	error: BOOL;
+	finished: BOOL := FALSE;
+END_VAR
+
+VAR
+	
+    nHeight     :   UDINT;
+    nWidth      :   UDINT;
+    y           :   UDINT;
+    x           :   UDINT;
+	
+    pRow        :   POINTER TO USINT;
+    nPixelValue :   USINT;
+	
+	hResult: HRESULT;
+	
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[	
+IF start AND (NOT finished) THEN
+	
+	// Retrieve the image width and height
+	//hResult := F_VN_GetImageWidth(image, nWidth, hResult);
+	//hResult := F_VN_GetImageHeight(image, nHeight, hResult);
+	
+	// Iterate every pixel of the image
+	
+	
+	FOR y := 0 TO constants.IMG_HEIGHT - 1 DO
+	
+		// Get the pointer to the image row
+		HRESULT := image.GetRowPointer(y, ADR(pRow));
+		
+		FOR x := 0 TO constants.IMG_WIDTH - 1 DO
+			
+			// Access the single pixel value
+			nPixelValue := pRow[x]; 
+			
+			// Assign the pixel value to the image matrix
+			imageMatrix[x+1, y+1] := nPixelValue; 
+			
+		END_FOR
+	
+		// It’s important to release the pointer. Otherwise there will be memory leaks.
+		HRESULT := image.ReleaseRowPointer(ADR(pRow)); 
+		
+	END_FOR
+
+	finished := TRUE;
+
+END_IF]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

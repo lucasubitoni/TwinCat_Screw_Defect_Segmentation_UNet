@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <GVL Name="constants" Id="{203cab9b-02ed-48a3-9134-c927705729f9}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+VAR_GLOBAL CONSTANT
+	
+	// Dimensions of the image
+	IMG_WIDTH: UDINT := 1080;
+	IMG_HEIGHT: UDINT := 1440;
+	
+	// Dimensions of the tile
+	TILE_WIDTH: UDINT := 216;
+	TILE_HEIGHT: UDINT := 288;
+	
+	// Total number of tiles
+	NUM_TILES: UDINT := 25; 
+	
+END_VAR]]></Declaration>
+  </GVL>
+</TcPlcObject>

@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="binarizeSegmentationMatrixFunction" Id="{37b3ccb0-f186-4e17-9717-d6c87574cc1d}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK binarizeSegmentationMatrixFunction
+
+VAR_INPUT
+	segmentationMatrix: ARRAY[1..constants.IMG_WIDTH, 1..constants.IMG_HEIGHT] OF REAL;
+	start: BOOL;
+END_VAR
+
+VAR_OUTPUT
+	finished: BOOL;
+END_VAR
+
+VAR_IN_OUT
+	segmentationMatrixBinarized: ARRAY[1..constants.IMG_WIDTH, 1..constants.IMG_HEIGHT] OF USINT; // From 0 to 255
+END_VAR
+
+VAR
+	x: UDINT;
+	y: UDINT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF start AND (NOT finished) THEN
+
+	FOR y := 1 TO constants.IMG_HEIGHT DO
+		FOR x := 1 TO constants.IMG_WIDTH DO
+			
+			IF segmentationMatrix[x, y] > 0.5 THEN // 0.5 is the threhsold of the neural network
+				segmentationMatrixBinarized[x, y] := 255;
+			ELSE
+				segmentationMatrixBinarized[x, y] := 0;
+			END_IF
+			
+		END_FOR
+	END_FOR
+	
+	finished := TRUE;
+	
+END_IF]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

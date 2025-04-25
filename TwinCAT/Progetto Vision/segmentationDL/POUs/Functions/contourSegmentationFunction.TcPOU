@@ -1,0 +1,128 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="contourSegmentationFunction" Id="{1a8a6ecd-26e2-4b14-88e5-a9289324aab8}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK contourSegmentationFunction
+
+VAR_INPUT
+	image: ITcVnImage; // The image "with the background"
+	segmentationImage: ITcVnImage; // The twincat image which contains the binarized segmentation mask
+	start: BOOL;
+	minimumArea: LREAL; // Minimum area for a defect for filtering small imprecisions
+END_VAR
+
+VAR_IN_OUT
+	contoursImage: ITcVnImage; // The image in which to display the segmentation
+	contoursImageDisp: ITcVnDisplayableImage;
+END_VAR
+
+
+VAR_OUTPUT
+	finished: BOOL;
+END_VAR
+
+VAR
+
+	contoursImageRef: REFERENCE TO ITcVnImage;
+	contoursImageDispRef: REFERENCE TO ITcVnDisplayableImage;
+	imageRgb: ITcVnImage;
+	imageRgbRef: REFERENCE TO ITcVnImage;
+
+	ipContourListRef: REFERENCE TO ITcVnContainer;
+	ipContour: ITcVnContainer;
+	ipIterator: ITcVnForwardIterator; // To iterate within the container of the contours
+	hResult: HRESULT;
+	aColorRed: TcVnVector4_LREAL := [255,0,0];
+	ipContourList: ITcVnContainer;
+	
+	fArea: LREAL; // The found area of from the contour
+	aCenter: TcVnPoint2_LREAL; // The center of the contour
+
+	oldCenter: TcVnPoint2_LREAL;
+	distanceBetweenDefects: LREAL := 100;
+	deltaX: LREAL;
+	
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[ipContourListRef REF= ipContourList;
+contoursImageRef REF= contoursImage;
+contoursImageDispRef REF= contoursImageDisp;
+imageRgbRef REF= imageRgb;
+
+IF (start) AND (NOT finished) THEN
+	
+	// Pass from grayscale to RGB 
+	hResult := F_VN_ConvertColorSpace(ipSrcImage := image,
+									  ipDestImage := imageRgbRef,
+									  eTransform := ETcVnColorSpaceTransform.TCVN_CST_GRAY_TO_RGB,
+							     	  hrPrev := hResult);
+		
+	// Copy the original image into the one with the contours so to have the background
+	hResult := F_VN_CopyImage(imageRgb, contoursImageRef, hResult);
+
+	// Find the contours 
+	hResult := F_VN_FindContours(ipSrcImage := segmentationImage,
+								 ipContours := ipContourListRef,
+					  			 hrPrev := hResult);
+
+	// Convert the contours into a displayble image if (1) we succeeded and (2) if we have not reached the end of the container
+	hResult := F_VN_GetForwardIterator(ipContourListRef, ipIterator, hResult);
+	WHILE SUCCEEDED(hResult) AND_THEN ipIterator.CheckIfEnd() <> S_OK DO
+		
+		hResult := F_VN_GetContainer(ipIterator, ipContour, hResult);
+		hResult := F_VN_IncrementIterator(ipIterator, hResult);
+		hResult := F_VN_ContourArea(ipContour, fArea, hResult);
+		
+		// Plot only if it is bigger than the minimum area
+		IF fArea >=minimumArea THEN
+			
+			// Plot the contour
+			hResult := F_VN_DrawContours(ipContour, -1, contoursImage, aColorRed, 3, hResult);
+			
+			// Find the center of the contour
+			hResult := F_VN_ContourCenterOfMass(ipContour, aCenter, hResult);
+			
+			// Put a new text only if the center of mass is far enough
+			IF (ABS(aCenter[0]-oldCenter[0]) + ABS(aCenter[1]-oldCenter[1])) > distanceBetweenDefects THEN
+				
+				// Putting the label either left or right
+				IF aCenter[0] > constants.IMG_WIDTH/2 THEN
+					deltaX := +50;
+				ELSE
+					deltaX := -200;
+				END_IF
+
+				// Plot the text
+				hResult := F_VN_PutText(sText := 'DEFECT', 
+										ipDestImage := contoursImage,
+										nX := LREAL_TO_UDINT(aCenter[0]+deltaX), 
+										nY := LREAL_TO_UDINT(aCenter[1]),
+										eFontType := ETcVnFontType.TCVN_FT_HERSHEY_TRIPLEX,
+										fFontScale := 1,
+										aColor := aColorRed,
+										hrPrev := hResult);
+				
+			END_IF
+			
+			oldCenter := aCenter;
+			
+
+		END_IF
+
+	END_WHILE
+	
+	// Copy the image into a displayable one so that we can access it via the ADS Image Watch
+    hResult := F_VN_CopyIntoDisplayableImage(ipSrcImage := contoursImage,
+                                             ipDestImage := contoursImageDispRef,
+                                             hrPrev := hResult);
+	
+	IF SUCCEEDED(hResult) THEN
+		finished := TRUE;
+	END_IF
+	
+END_IF
+
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

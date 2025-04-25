@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="imageNormalizationFunction" Id="{4fe8d203-47f6-4c64-9131-0c60395d5c06}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK imageNormalizationFunction
+
+VAR_IN_OUT
+	imageMatrix: ARRAY[1..constants.IMG_WIDTH, 1..constants.IMG_HEIGHT] OF REAL;
+END_VAR
+
+VAR_INPUT
+	start: BOOL;
+END_VAR
+
+VAR_OUTPUT
+	error: BOOL;
+	finished: BOOL := FALSE;
+END_VAR
+
+VAR
+	x: UDINT;
+	y: UDINT;
+	normalizationFactor: REAL := 255.0;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[	
+IF (start) AND (NOT finished) THEN
+	
+	FOR x := 1 TO constants.IMG_WIDTH DO
+		FOR y := 1 TO constants.IMG_HEIGHT DO
+			
+			imageMatrix[x, y] := imageMatrix[x, y] / normalizationfactor;
+			
+		END_FOR
+	END_FOR
+	
+	finished := TRUE;
+	 
+END_IF
+	]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

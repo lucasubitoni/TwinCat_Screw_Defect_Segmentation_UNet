@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="imageTilingFunction" Id="{d7144ecf-50c4-49ba-acae-4e3745fb0127}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK imageTilingFunction
+
+VAR_IN_OUT
+	tiles: ARRAY[1..constants.NUM_TILES, 1..constants.TILE_WIDTH, 1..constants.TILE_HEIGHT] OF REAL;
+	start: BOOL;
+END_VAR
+
+VAR_INPUT
+    imageMatrix: ARRAY[1..constants.IMG_WIDTH, 1..constants.IMG_HEIGHT] OF REAL;
+END_VAR
+
+VAR_OUTPUT
+	finished: BOOL;
+END_VAR
+
+VAR
+    tileRow: UDINT; // Row of the tile grid
+    tileCol: UDINT; // Column of the tile grid
+    currentTile: UDINT; // Counter for the tiles
+    
+    startX: UDINT; // X coordinate for the start of the tile
+    startY: UDINT; // Y coordinate for the start of the tile
+    X: UDINT; // X position within the tile
+    Y: UDINT; // Y position within the tile
+	
+	nTilesHorizontal: UDINT;
+	nTilesVertical: UDINT;
+	
+	
+    
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+IF start AND NOT finished THEN
+	
+	// We start from the first tile
+	currentTile := 1;
+	
+	// Finding how many tiles in the horizontal and vertical direction
+	nTilesVertical := constants.IMG_HEIGHT / constants.TILE_HEIGHT;
+	nTilesHorizontal := constants.IMG_WIDTH / constants.TILE_WIDTH;
+	
+	
+	// Cycling on the tiles
+	
+	// Y
+	FOR tileRow := 1 TO nTilesVertical DO
+		
+		// X
+		FOR tileCol := 1 TO nTilesHorizontal DO
+	
+			// Determining the top left point coordinate of each tile
+			startY := (tileRow - 1) * constants.TILE_HEIGHT + 1;
+			startX := (tileCol - 1) * constants.TILE_WIDTH + 1;
+			
+			// Cycling on the pixels of the tile
+			FOR X := 1 TO constants.TILE_WIDTH DO
+				FOR Y := 1 TO constants.TILE_HEIGHT DO
+					tiles[currentTile, X, Y] := imageMatrix[startX + X - 1, startY + Y - 1]; // Subtract 1 since the inner for loops add 1
+				END_FOR
+			END_FOR
+	
+			// Update the current tile
+			currentTile := currentTile + 1;
+	
+		END_FOR
+	END_FOR
+
+	finished := TRUE;
+
+END_IF]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

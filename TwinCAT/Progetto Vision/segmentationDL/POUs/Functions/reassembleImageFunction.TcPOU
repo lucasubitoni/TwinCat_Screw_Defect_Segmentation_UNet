@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="reassembleImageFunction" Id="{6a8d40fa-c77d-4fcf-8c6f-97c3a6b24dad}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK reassembleImageFunction
+
+VAR_IN_OUT
+    tiles: ARRAY[1..constants.NUM_TILES, 1..constants.TILE_WIDTH, 1..constants.TILE_HEIGHT] OF REAL;
+    start: BOOL;
+END_VAR
+
+VAR_OUTPUT
+    imageMatrix: ARRAY[1..constants.IMG_WIDTH, 1..constants.IMG_HEIGHT] OF REAL;
+    finished: BOOL;
+END_VAR
+
+VAR
+    tileRow: UDINT;
+    tileCol: UDINT;
+    currentTile: UDINT;
+
+    startX: UDINT;
+    startY: UDINT;
+    X: UDINT;
+    Y: UDINT;
+
+    nTilesHorizontal: UDINT;
+    nTilesVertical: UDINT;
+	
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+IF start AND NOT finished THEN
+	
+	// We start from the first tile
+	currentTile := 1;
+	
+	// Finding how many tiles in the horizontal and vertical direction
+	nTilesVertical := constants.IMG_HEIGHT / constants.TILE_HEIGHT;
+	nTilesHorizontal := constants.IMG_WIDTH / constants.TILE_WIDTH;
+	
+	
+	// Cycling on the tiles
+	
+	// Y
+	FOR tileRow := 1 TO nTilesVertical DO
+		
+		// X
+		FOR tileCol := 1 TO nTilesHorizontal DO
+	
+			// Determining the top left point coordinate of each tile
+			startY := (tileRow - 1) * constants.TILE_HEIGHT + 1;
+			startX := (tileCol - 1) * constants.TILE_WIDTH + 1;
+			
+			// Cycling on the pixels of the tile
+			FOR X := 1 TO constants.TILE_WIDTH DO
+				FOR Y := 1 TO constants.TILE_HEIGHT DO
+					imageMatrix[startX + X - 1, startY + Y - 1] := tiles[currentTile, X, Y]; // Subtract 1 since the inner for loops add 1
+				END_FOR
+			END_FOR
+	
+			// Update the current tile
+			currentTile := currentTile + 1;
+	
+		END_FOR
+	END_FOR
+
+	finished := TRUE;
+
+END_IF]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

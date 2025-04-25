@@ -1,0 +1,110 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="nnPredictFunction" Id="{ad6a0ed1-aafb-45a1-ae38-7f3fa99fb64b}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK nnPredictFunction
+
+// see: https://infosys.beckhoff.com/english.php?content=../content/1033/tf3820_tc3_machine_learning_server/17276127115.html&id=9003034378846799115
+
+VAR_INPUT
+	tiles: ARRAY[1..constants.NUM_TILES, 1..constants.TILE_WIDTH, 1..constants.TILE_HEIGHT] OF REAL;
+	modelFilePath: STRING;
+	start: BOOL;
+END_VAR
+
+VAR_OUTPUT
+	segmentationTiles: ARRAY[1..constants.NUM_TILES, 1..constants.TILE_WIDTH, 1..constants.TILE_HEIGHT] OF REAL;
+	finished: BOOL;
+	error: BOOL;
+END_VAR
+
+VAR
+
+	stModelInput: ST_modelInput;
+	stModelOutput: ST_modelOutput;
+
+	fbMlSvr: FB_MlSvrPrediction;
+	
+	n: UDINT := 1;
+	x: UDINT;
+	y: UDINT;
+	
+	nextTile: BOOL := TRUE;
+	
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// ===================================
+// 1. Configuring the ML server
+// ===================================
+
+// Path to model  
+fbMlSvr.stPredictionParameter.sMlModelFilePath := modelFilePath;
+
+ // We want to execute the model on localsystem --> localhost                                     
+fbMlSvr.stPredictionParameter.sMlSvrNetId := '127.0.0.1.1.1';
+
+// Where to execute the model --> CPU
+fbMlSVr.stPredictionParameter.eExecutionProvider := E_EXECUTIONPROVIDER.CPU; 
+
+// Submit configuration request to the TcMlServer
+fbMlSvr.Configure(nTimeout := 1000, nPriority:=0);
+
+IF (fbMlSvr.bError) THEN
+	error := TRUE;
+END_IF
+
+
+// ===================================================
+// 2. Use the model for predictions
+// ===================================================
+
+// If the server is configured
+IF (fbMlSvr.bConfigured) AND (start) AND (NOT finished) THEN
+	
+	// Cycling on the tiles, use an IF statement since it can take multiple PLC cycles
+	IF n <= constants.NUM_TILES THEN
+		
+		// If it is time to process the next tile
+		IF nextTile THEN
+			
+			nextTile := FALSE;
+			
+			// Format the tile for the model input
+			FOR y := 1 TO constants.TILE_HEIGHT DO
+				FOR x := 1 TO constants.TILE_WIDTH DO
+					stModelInput.in_args_0[0, y-1, x-1, 0] := tiles[n, x, y];
+				END_FOR
+			END_FOR
+			
+		END_IF
+		
+		// Predict
+		IF fbMlSvr.Predict(pDataIn := ADR(stModelInput), 
+						   nDataInSize := SIZEOF(stModelInput), 
+						   pDataOut := ADR(stModelOutput), 
+						   nDataOutSize := SIZEOF(stModelOutput),
+						   nTimeout := 10000,
+						   nPriority := 0) THEN
+						   
+			// Reassemble output
+			FOR y := 1 TO constants.TILE_HEIGHT DO
+				FOR x := 1 TO constants.TILE_WIDTH DO
+					segmentationTiles[n, x, y] := stModelOutput.out_conv2d_14[0, y-1, x-1, 0];
+				END_FOR
+			END_FOR
+					
+			// Go to next tile	   
+			nextTile := TRUE;
+			n := n+1;
+							
+		END_IF
+		
+	END_IF
+	
+END_IF	
+
+// When it has finished processing all the tiles, raise a flag
+finished := (n = constants.NUM_TILES+1);]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="MAIN" Id="{308b0501-f58f-4032-8c22-c1ff29f2e3cb}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM MAIN
+VAR
+	
+	filePath: STRING := 'C:\Users\UserName\Desktop\visionFiles\images\000188.jpg'; // Change accordingly
+	
+	modelFilePath: STRING := 'C:\Users\UserName\Desktop\visionFiles\model\model.json'; // Change accordingly
+	
+	// Processing chain
+	readImage: readImageFunction;
+	convertToBw: convertToBwFunction;
+	imageToMatrix: imageToMatrixFunction;
+	imageNormalization: imageNormalizationFunction;
+	imageTiling: imageTilingFunction;
+	nnPredict: nnPredictFunction;
+	reassembleImage: reassembleImageFunction;
+	matrixToMask: matrixToMaskFunction;
+	binarizeSegmentationMatrix: binarizeSegmentationMatrixFunction;
+	contourSegmentation: contourSegmentationFunction;
+	
+	image: ITcVnImage;
+	imageDisp: ITcVnDisplayableImage;
+	
+	segmentation: ITcVnImage;
+	segmentationDisp: ITcVnDisplayableImage;
+	
+	contours: ITcVnImage;
+	contoursDisp: ITcVnDisplayableImage;
+
+	
+	imageMatrix: ARRAY[1..constants.IMG_WIDTH, 1..constants.IMG_HEIGHT] OF REAL;
+	tiles: ARRAY[1..constants.NUM_TILES, 1..constants.TILE_WIDTH, 1..constants.TILE_HEIGHT] OF REAL;
+	
+	segmentationTiles: ARRAY[1..constants.NUM_TILES, 1..constants.TILE_WIDTH, 1..constants.TILE_HEIGHT] OF REAL;
+	segmentationMatrix: ARRAY[1..constants.IMG_WIDTH, 1..constants.IMG_HEIGHT] OF REAL;
+	segmentationMatixBinarized: ARRAY[1..constants.IMG_WIDTH, 1..constants.IMG_HEIGHT] OF USINT;
+	
+	error: BOOL;
+	hResult: HRESULT;
+
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// Read the image
+readImage(filePath := filePath,
+		  image := image,
+		  imageDisp := imageDisp,
+		  error => error);
+		  
+// Convert the image to Black and White
+convertToBw(image := image,
+			imageDisp := imageDisp,
+			start := readImage.finished,
+			error => error);
+
+// Extract the image values in the form of a matrix
+imageToMatrix(image := image,
+			  start := convertToBw.finished,
+			  imageMatrix := imageMatrix,
+			  error => error);
+
+// Normalize image values from 0->255 to 0->1		  
+imageNormalization(imageMatrix := imageMatrix,
+					start := imageToMatrix.finished,
+					error => error);
+					
+// Tile the image			  
+imageTiling(tiles := tiles,
+			imageMatrix := imageMatrix,
+			start := imageNormalization.finished);
+					
+// Neural Network prediction
+nnPredict(tiles := tiles,
+		  modelFilePath := modelFilePath,
+		  start := imageTiling.finished,
+		  segmentationTiles => segmentationTiles);
+
+// Reassembling tiles into an image matrix
+reassembleImage(tiles := segmentationTiles,
+				start := nnPredict.finished,
+				imageMatrix => segmentationMatrix);
+				
+// Binarize the output of the neural network
+binarizeSegmentationMatrix(segmentationMatrix := segmentationMatrix,
+						   segmentationMatrixBinarized := segmentationMatixBinarized,
+						   start := reassembleImage.finished);
+
+// Use this to convert the segmentation matrix into a usable twincat image
+matrixToMask(matrix := segmentationMatixBinarized,
+			 image := segmentation,
+			 imageDisp := segmentationDisp,
+			 start := 	binarizeSegmentationMatrix.finished,
+			 error => error);
+
+// Plot the contour overlaid 
+contourSegmentation(image := image,
+					segmentationImage := segmentation,
+					contoursImage := contours,
+					contoursImageDisp := contoursDisp,
+					minimumArea := 100,
+					start := matrixToMask.finished,);]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

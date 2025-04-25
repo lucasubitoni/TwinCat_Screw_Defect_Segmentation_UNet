@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="flattenMatrixFunction" Id="{c8b1e2ce-90db-46b5-a980-ea717187ef3a}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK flattenMatrixFunction
+VAR_INPUT
+	matrix: ARRAY[1..constants.IMG_WIDTH, 1..constants.IMG_HEIGHT] OF REAL;
+	start: BOOL;
+END_VAR
+
+VAR_IN_OUT
+	flattenedMatrix: ARRAY[1..constants.IMG_WIDTH*constants.IMG_HEIGHT] OF REAL;
+END_VAR
+
+VAR_OUTPUT
+	finished: BOOL;
+END_VAR
+
+
+VAR
+	i: UDINT;
+	x: UDINT;
+	y: UDINT;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+IF (start) AND (NOT finished) THEN
+	
+	// We start from one
+	i := 1;
+	
+	// First we have to cycle on the y,
+	// as the flattened vector is expected to be set up in this way
+	FOR y := 1 TO constants.IMG_HEIGHT DO
+		
+		// Then we have to cycle on the x
+		FOR x := 1 TO constants.IMG_WIDTH DO
+			flattenedMatrix[i] := matrix[x, y];
+			i := i+1;
+		END_FOR
+	END_FOR
+
+	finished := TRUE;
+
+END_IF]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

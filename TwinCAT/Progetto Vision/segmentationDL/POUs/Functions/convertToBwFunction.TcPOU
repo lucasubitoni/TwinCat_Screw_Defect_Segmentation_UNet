@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="convertToBwFunction" Id="{28d96b12-9105-462e-8711-bd506626c08a}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK convertToBwFunction
+
+VAR_IN_OUT
+	image: ITcVnImage;
+	imageDisp: ITcVnDisplayableImage;
+END_VAR
+
+VAR_INPUT
+	start: BOOL;
+END_VAR
+
+VAR_OUTPUT
+	error: BOOL;
+	finished: BOOL := FALSE;
+END_VAR
+
+
+VAR
+
+	originalImage: ITcVnImage;
+
+	imageRef: REFERENCE TO ITcVnImage;
+	imageDispRef: REFERENCE TO ITcVnDisplayableImage;
+	
+	hResult: HRESULT;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// Assign references
+imageRef REF= image;
+imageDispRef REF= imageDisp;
+	
+IF (start) AND (NOT error) AND (NOT finished) THEN
+	
+	originalImage := image;
+
+	// Convert to black and white
+	hResult := F_VN_ConvertColorSpace(ipSrcImage := image,
+										ipDestImage := imageRef,
+										eTransform := ETcVnColorSpaceTransform.TCVN_CST_RGB_TO_GRAY,
+										hrPrev := hResult);
+										
+	// If there is an error, latch onto it
+    IF FAILED(hResult) THEN
+        error := TRUE;
+    END_IF
+	
+	IF SUCCEEDED(hResult) THEN
+		
+		 // Copy the image into a displayable one so that we can access it via the ADS Image Watch
+		hResult := F_VN_CopyIntoDisplayableImage(ipSrcImage := image,
+											    	ipDestImage := imageDispRef,
+											    	hrPrev := hResult);
+	
+		// If there is an error, latch onto it
+		IF FAILED(hResult) THEN
+			error := TRUE;
+		END_IF
+		
+		IF SUCCEEDED(hResult) THEN
+			finished := TRUE;
+		END_IF
+		
+	END_IF
+	
+END_IF
+
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

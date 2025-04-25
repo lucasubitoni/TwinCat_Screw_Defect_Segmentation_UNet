@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="binarizeSegmentationImageFunction" Id="{ea31f9e6-5135-4ef2-9c95-b55278d2b94d}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK binarizeSegmentationImageFunction
+VAR_IN_OUT
+	segmentationImage: ITcVnImage;
+    segmentationImageBinarized: ITcVnImage;
+	segmentationImageBinarizedDisp: ITcVnDisplayableImage;
+END_VAR
+
+VAR_INPUT
+	start: BOOL;
+END_VAR
+
+VAR_OUTPUT
+	finished: BOOL;
+END_VAR
+
+VAR
+	segmentationImageBinarizedRef: REFERENCE TO ITcVnImage;
+	
+	fThreshold: LREAL := 0.5;
+    fMaxValue: LREAL := 255; // 255 is the maximum representable integer in the 8 bit color space
+    eThresholdType: ETcVnThresholdType := ETcVnThresholdType.TCVN_TT_BINARY;
+    hResult: HRESULT;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[segmentationImageBinarizedRef REF= segmentationImageBinarized;
+
+IF start AND (NOT finished) THEN
+	
+	hResult := F_VN_Threshold(ipSrcImage := segmentationImage,
+							  ipDestImage := segmentationImageBinarizedRef,
+							  fThreshold := fThreshold, 
+							  fMaxValue := fMaxValue,
+							  eThresholdType := eThresholdType,
+							  hrPrev := hResult);
+	
+	IF SUCCEEDED(hResult) THEN
+		
+		 // Copy the image into a displayable one so that we can access it via the ADS Image Watch
+		hResult := F_VN_CopyIntoDisplayableImage(ipSrcImage := segmentationImageBinarized,
+											     ipDestImage := segmentationImageBinarizedDisp,
+											     hrPrev := hResult);
+												 
+		IF SUCCEEDED(hResult) THEN
+			finished := TRUE;
+		END_IF
+		
+	END_IF
+	
+					  
+END_IF
+
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>
