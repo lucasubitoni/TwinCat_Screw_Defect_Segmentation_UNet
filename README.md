@@ -19,7 +19,7 @@ This project focuses on the detection and segmentation of manufacturing defects 
 - **Architecture:** U-Net  
 - **Export Format:** ONNX (Open Neural Network Exchange) for TwinCAT compatibility
 
-![Model Overview](README_images/model_overview.png)
+![Model Overview](README_images/model_overview.jpg)
 
 ### 2.1 Training
 
