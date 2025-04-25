@@ -6,8 +6,6 @@ Development and integration of a Deep Learning trained in Python model for defec
 
 This project focuses on the detection and segmentation of manufacturing defects on screw components using a convolutional neural network (U-Net), trained in Python and integrated into TwinCAT for industrial use.
 
-![Model Overview](images/model_overview.png)
-
 ## 1. Dataset
 
 - **Source:** [VISION Datasets: A Benchmark for Vision-based InduStrial InspectiON](https://arxiv.org/abs/2306.07890), H.Bai et al.
@@ -21,8 +19,7 @@ This project focuses on the detection and segmentation of manufacturing defects 
 - **Architecture:** U-Net  
 - **Export Format:** ONNX (Open Neural Network Exchange) for TwinCAT compatibility
 
-![Model Overview](images/movel_overview.png)
-
+![Model Overview](README_images/model_overview.png)
 
 ### 2.1 Training
 
@@ -32,8 +29,6 @@ This project focuses on the detection and segmentation of manufacturing defects 
 - **Data augmentation**: Overlapping patch extraction, random brightness, random rotations, random contrast adjustments
 - **Early Stopping:** Training stops if the IoU score on the validation set did not improve for 20 consecutive epochs
 
-![Training Process](images/training_curves.png)
-
 ### 2.2 Inference
 
 - The trained model is tested on previously unseen, non-annotated images  
@@ -41,9 +36,9 @@ This project focuses on the detection and segmentation of manufacturing defects 
 - Each patch is processed by the model to generate a segmentation mask  
 - The individual masks are then recombined into a final segmentation output
 
-![Prediction Example 1](images/vis_000173.png)
-![Prediction Example 2](images/vis_000177.png)
-![Prediction Example 3](images/vis_000186.png)
+![Prediction Example 1](README_images/vis_000173.jpg)
+![Prediction Example 2](README_images/vis_000177.jpg)
+![Prediction Example 3](README_images/vis_000186.jpg)
 
 Additional images for the model predicitons are available in: "Python Code/Predictiions"
 
@@ -60,7 +55,7 @@ Additional images for the model predicitons are available in: "Python Code/Predi
 - Asynchronous inference using ONNX model
 - Model management via TwinCAT Machine Learning Manager
 
-![TwinCAT Integration](images/twincat_integration.png)
+![TwinCAT Integration](README_images/twincat_integration.png)
 
 ## Author
 
