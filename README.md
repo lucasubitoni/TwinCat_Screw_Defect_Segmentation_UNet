@@ -15,7 +15,7 @@ This project focuses on the detection and segmentation of manufacturing defects 
 
 ## 2. Deep Learning Model
 
-- **Main frameworks:** Python, TensorFlow Keras  
+- **Main framework:** Python TensorFlow Keras  
 - **Architecture:** U-Net  
 - **Export Format:** ONNX (Open Neural Network Exchange) for TwinCAT compatibility
 
