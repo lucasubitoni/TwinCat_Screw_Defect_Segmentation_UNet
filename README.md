@@ -15,14 +15,14 @@ This project focuses on the detection and segmentation of manufacturing defects 
 - **Content:** High-resolution images (1080x1920) of screws with annotated manufacturing defects  
 - **Annotations:** Provided in COCO format  
 
-
-![Dataset Sample](images/dataset_sample.png)
-
 ## 2. Deep Learning Model
 
 - **Main frameworks:** Python, TensorFlow Keras  
 - **Architecture:** U-Net  
 - **Export Format:** ONNX (Open Neural Network Exchange) for TwinCAT compatibility
+
+![Model Overview](images/movel_overview.png)
+
 
 ### 2.1 Training
 
@@ -41,7 +41,9 @@ This project focuses on the detection and segmentation of manufacturing defects 
 - Each patch is processed by the model to generate a segmentation mask  
 - The individual masks are then recombined into a final segmentation output
 
-![Prediction Example](images/prediction_example.png)
+![Prediction Example 1](images/vis_000173.png)
+![Prediction Example 2](images/vis_000177.png)
+![Prediction Example 3](images/vis_000186.png)
 
 ## 3 TwinCAT Integration
 
