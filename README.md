@@ -8,7 +8,7 @@ This project focuses on the detection and segmentation of manufacturing defects 
 
 ## 1. Dataset
 
-- **Source:** [VISION Datasets: A Benchmark for Vision-based InduStrial InspectiON](https://arxiv.org/abs/2306.07890), H.Bai et al.
+- **Source:** [VISION Datasets: A Benchmark for Vision-based InduStrial InspectiON](https://arxiv.org/abs/2306.07890), by H.Bai et al.
 - **Subset Used:** Screw dataset  
 - **Content:** High-resolution images (1080x1920) of screws with annotated manufacturing defects  
 - **Annotations:** Provided in COCO format  
