@@ -45,6 +45,8 @@ This project focuses on the detection and segmentation of manufacturing defects 
 ![Prediction Example 2](images/vis_000177.png)
 ![Prediction Example 3](images/vis_000186.png)
 
+Additional images for the model predicitons are available in: "Python Code/Predictiions"
+
 ## 3 TwinCAT Integration
 
 ### 3.1 TC3 Vision (TF7100)
