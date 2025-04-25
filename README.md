@@ -36,11 +36,12 @@ This project focuses on the detection and segmentation of manufacturing defects 
 - Each patch is processed by the model to generate a segmentation mask  
 - The individual masks are then recombined into a final segmentation output
 
+Additional images for the model predicitons are available in: "Python Code/Predictions"
+
 ![Prediction Example 1](README_images/vis_000173.jpg)
 ![Prediction Example 2](README_images/vis_000177.jpg)
 ![Prediction Example 3](README_images/vis_000186.jpg)
 
-Additional images for the model predicitons are available in: "Python Code/Predictiions"
 
 ## 3 TwinCAT Integration
 
