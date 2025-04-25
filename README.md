@@ -10,7 +10,7 @@ This project focuses on the detection and segmentation of manufacturing defects 
 
 - **Source:** [VISION Datasets: A Benchmark for Vision-based InduStrial InspectiON](https://arxiv.org/abs/2306.07890), by H. Bai et al.
 - **Subset Used:** Screw dataset  
-- **Content:** High-resolution images (1080x1440) of screws with annotated manufacturing defects  
+- **Content:** High-resolution images (1080x1440 pixels) of screws with annotated manufacturing defects  
 - **Annotations:** Provided in COCO format  
 
 ## 2. Deep Learning Model
@@ -26,7 +26,7 @@ This project focuses on the detection and segmentation of manufacturing defects 
 - **Supervised Training**
 - **Loss Function:** Dice loss
 - **Metrics:** Intersection Over Union (IoU)
-- **Data augmentation**: Overlapping patch extraction, random brightness, random rotations, random contrast adjustments
+- **Data augmentation**: Overlapping patch extraction (216x288 pixels), random brightness, random rotations, random contrast adjustments
 - **Early Stopping:** Training stops if the IoU score on the validation set did not improve for 20 consecutive epochs
 
 ### 2.2 Inference
