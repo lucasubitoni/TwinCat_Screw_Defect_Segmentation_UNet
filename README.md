@@ -10,7 +10,7 @@ This project focuses on the detection and segmentation of manufacturing defects 
 
 ## 1. Dataset
 
-- **Source:** [VISION Datasets: A Benchmark for Vision-based InduStrial InspectiON, H.Bai et al.](https://arxiv.org/abs/2306.07890) 
+- **Source:** [VISION Datasets: A Benchmark for Vision-based InduStrial InspectiON](https://arxiv.org/abs/2306.07890), H.Bai et al.
 - **Subset Used:** Screw dataset  
 - **Content:** High-resolution images (1080x1920) of screws with annotated manufacturing defects  
 - **Annotations:** Provided in COCO format  
@@ -41,7 +41,7 @@ This project focuses on the detection and segmentation of manufacturing defects 
 - Each patch is processed by the model to generate a segmentation mask  
 - The individual masks are then recombined into a final segmentation output
 
-![Prediction Example](images/prediction.png)
+![Prediction Example](images/prediction_example.png)
 
 ## 3 TwinCAT Integration
 
@@ -56,7 +56,7 @@ This project focuses on the detection and segmentation of manufacturing defects 
 - Asynchronous inference using ONNX model
 - Model management via TwinCAT Machine Learning Manager
 
-![TwinCAT Integration](images/twincat.png)
+![TwinCAT Integration](images/twincat_integration.png)
 
 ## Author
 
