@@ -1,6 +1,6 @@
 # TwinCAT Screw Defect Segmentation U-Net
 
-Development and integration of a Deep Learning trained in Python model for defect segmentation on industrial components, deployed within the TwinCAT environment.
+Development and integration of a Deep Learning trained in Python model for defect segmentation on screw components, deployed within the Beckhoff TwinCAT environment.
 
 ## Overview
 
