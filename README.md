@@ -31,8 +31,8 @@ This project focuses on the detection and segmentation of manufacturing defects 
 
 ### 2.2 Inference
 
-- The trained model is tested on previously unseen, non-annotated images  
-- Each image (1080x1920) is split into 25 non-overlapping patches  
+- The trained model is then used on unseen, non-annotated images  
+- Each image is split into 25 non-overlapping patches  
 - Each patch is processed by the model to generate a segmentation mask  
 - The individual masks are then recombined into a final segmentation output
 
