@@ -19,7 +19,7 @@ This project focuses on the detection and segmentation of manufacturing defects 
 - **Architecture:** U-Net  
 - **Export Format:** ONNX (Open Neural Network Exchange) for TwinCAT compatibility
 
-![Model Overview](README_images/model_overview.jpg)
+![Model Overview](README_images/compressed/model_overview.jpg)
 
 ### 2.1 Training
 
@@ -38,10 +38,10 @@ This project focuses on the detection and segmentation of manufacturing defects 
 
 Additional images for the model predicitons are available in: "Python Code/Predictions"
 
-![Prediction Example 1](README_images/vis_000173.jpg)
-![Prediction Example 2](README_images/vis_000177.jpg)
-![Prediction Example 3](README_images/vis_000186.jpg)
-![Prediction Example 4](README_images/vis_000145.jpg)
+![Prediction Example 1](README_images/compressed/vis_000173.jpg)
+![Prediction Example 2](README_images/compressed/vis_000177.jpg)
+![Prediction Example 3](README_images/compressed/vis_000186.jpg)
+![Prediction Example 4](README_images/compressed/vis_000145.jpg)
 
 ## 3 TwinCAT Integration
 
@@ -56,7 +56,7 @@ Additional images for the model predicitons are available in: "Python Code/Predi
 - Asynchronous inference using ONNX model
 - Model management via TwinCAT Machine Learning Manager
 
-![TwinCAT Integration](README_images/twincat_integration.png)
+![TwinCAT Integration](README_images/compressed/twincat_integration.png)
 
 ## Author
 
