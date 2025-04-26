@@ -1,6 +1,6 @@
 # TwinCAT Screw Defect Segmentation U-Net
 
-Development and integration of a Deep Learning trained in Python model for defect segmentation on industrial components, deployed within the TwinCAT environment.
+Development and integration of a Deep Learning trained in Python model for defect segmentation on screw components, deployed within the Beckhoff TwinCAT environment.
 
 ## Overview
 
@@ -8,14 +8,14 @@ This project focuses on the detection and segmentation of manufacturing defects 
 
 ## 1. Dataset
 
-- **Source:** [VISION Datasets: A Benchmark for Vision-based InduStrial InspectiON](https://arxiv.org/abs/2306.07890), H.Bai et al.
+- **Source:** [VISION Datasets: A Benchmark for Vision-based InduStrial InspectiON](https://arxiv.org/abs/2306.07890), by H. Bai et al.
 - **Subset Used:** Screw dataset  
-- **Content:** High-resolution images (1080x1920) of screws with annotated manufacturing defects  
+- **Content:** High-resolution images (1080x1440 pixels) of screws with annotated manufacturing defects  
 - **Annotations:** Provided in COCO format  
 
 ## 2. Deep Learning Model
 
-- **Main frameworks:** Python, TensorFlow Keras  
+- **Main framework:** Python TensorFlow Keras  
 - **Architecture:** U-Net  
 - **Export Format:** ONNX (Open Neural Network Exchange) for TwinCAT compatibility
 
@@ -26,13 +26,13 @@ This project focuses on the detection and segmentation of manufacturing defects 
 - **Supervised Training**
 - **Loss Function:** Dice loss
 - **Metrics:** Intersection Over Union (IoU)
-- **Data augmentation**: Overlapping patch extraction, random brightness, random rotations, random contrast adjustments
+- **Data augmentation**: Overlapping patch extraction (216x288 pixels), random brightness, random rotations, random contrast adjustments
 - **Early Stopping:** Training stops if the IoU score on the validation set did not improve for 20 consecutive epochs
 
 ### 2.2 Inference
 
-- The trained model is tested on previously unseen, non-annotated images  
-- Each image (1080x1920) is split into 25 non-overlapping patches  
+- The trained model is then used on unseen, non-annotated images  
+- Each image is split into 25 non-overlapping patches  
 - Each patch is processed by the model to generate a segmentation mask  
 - The individual masks are then recombined into a final segmentation output
 
