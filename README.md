@@ -42,7 +42,6 @@ Additional images for the model predicitons are available in: "Python Code/Predi
 ![Prediction Example 2](README_images/vis_000177.jpg)
 ![Prediction Example 3](README_images/vis_000186.jpg)
 ![Prediction Example 4](README_images/vis_000145.jpg)
-![Prediction Example 5](README_images/vis_000179.jpg)
 
 ## 3 TwinCAT Integration
 
